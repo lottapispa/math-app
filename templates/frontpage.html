@@ -21,11 +21,34 @@
 
     <p>
     Welcome to the app!
-    <br>
-    (Note: only student's view right now)
     <p>
-    <h3>Courses:</h3>
-      <li><a href="/elementary-math">Elementary math</a></li>
+    {% if session.user_type == "teacher"  %}
+    <form action="/add_course" method="POST">
+      Add a new course: 
+      <p>
+        Course name: <br />
+        <input type="text" name="name" maxlength="100" required>
+      </p>
+      <input type="submit" value="Add a new course">
+    </form>
+
+    <h3>My courses:</h3>
+      <li>A course that this teacher has made</li>
+      <li>This list should be able to be empty</li>
+    {% endif %}
+
+    {% if session.user_type == "student"  %}
+    <h3>My courses:</h3>
+      <li>A course that this student is enrolled in</li>
+    {% endif %}
+
+    <h3>Courses: (not links yet)</h3>
+    {% for course in courses %}
+      <li>{(course.name)}</li>
+    {% endfor %}
+
+
+    
 </body>
 
 </html>
