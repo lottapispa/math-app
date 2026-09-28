@@ -22,11 +22,20 @@
 - [ ] The teacher can edit a course.
 
 ### Thoughts
+#### Database:
 - Change database: where to add unique or not null, text vs varchar (max length). Can a course not include text material and only have tests or vice versa; which elements are mandatory? 
+- Separate test results database and course results database? Exercise answers  and test_results?
+- How easy/difficult is it to change schema later? Should that be fully done before implementation?
+- Conflicting info on table naming conventions, camelCase on using_underscore?
+- Correct answer in exercises as text or integer (it is math)?
+#### Other:
 - Automate answer checking, or does the teacher do it? 
 - Option to add a deadline for tests? 
 - Is a student joining a course different from just starting it? Do you need to join to do the exercises? 
 - Add the option to need a key to join a course? 
+- How many questions can a test have, is there a min and a max? How to implement that?
+- Where are you redirected after new course is done?
+- Can a teacher use other teachers courses? How can they access their own students results?
 
 ### Plan for the database
 
