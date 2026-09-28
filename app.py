@@ -1,9 +1,7 @@
 from flask import Flask, session
 from flask import redirect, render_template, request
 import sqlite3
-import config
-from werkzeug.security import generate_password_hash, check_password_hash
-import db
+import config, courses, users
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -12,42 +10,38 @@ app.secret_key = config.secret_key
 def index():
     return render_template("index.html")
 
-@app.route("/register")
+@app.route("/register", methods=["GET", "POST"])
 def register():
-    return render_template("register.html")
+    if request.method == "GET":
+        return render_template("register.html")
+    if request.method == "POST":
+        user_type = request.form["type"]
+        username = request.form["username"]
+        password1 = request.form["password1"]
+        password2 = request.form["password2"]
+        if password1 != password2:
+            return "ERROR: the passwords don't match"
 
-@app.route("/create", methods=["POST"])
-def create():
-    user_type = request.form["type"]
-    username = request.form["username"]
-    password1 = request.form["password1"]
-    password2 = request.form["password2"]
-    if password1 != password2:
-        return "ERROR: the passwords don't match"
-    password_hash = generate_password_hash(password1)
+        try:
+            users.register(username, password1, user_type)
+        except sqlite3.IntegrityError:
+            return "ERROR: username is taken"
 
-    try:
-        sql = "INSERT INTO users (username, password_hash, user_type) VALUES (?, ?, ?)"
-        db.execute(sql, [username, password_hash, user_type])
-    except sqlite3.IntegrityError:
-        return "ERROR: username is taken"
-
-    # Figure out how to send a "User created" message and then return to index.
-    return redirect("/")
+        return redirect("/")
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    username = request.form["username"]
-    password = request.form["password"]
-    
-    sql = "SELECT password_hash FROM users WHERE username = ?"
-    password_hash = db.query(sql, [username])[0][0]
+    if request.method == "GET":
+        return render_template("index.html")
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
 
-    if check_password_hash(password_hash, password):
-        session["username"] = username
-        return redirect("/frontpage")
-    else:
-        return "ERROR: wrong username or password"
+        if users.login(username, password):
+            session["username"] = username
+            return redirect("/frontpage")
+        else:
+            return "ERROR: wrong username or password"
 
 @app.route("/logout", methods=["GET", "POST"])
 def logout():
